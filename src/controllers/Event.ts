@@ -3,10 +3,16 @@ import mongoose from 'mongoose';
 import Event from '../models/Event';
 
 const createEvent = (req: Request, res: Response, next: NextFunction) => {
-    const { name } = req.body;
+    const { name, group, date, repeat, location, description, iconURL } = req.body;
     const event = new Event({
         _id: new mongoose.Types.ObjectId(),
-        name
+        name,
+        group,
+        date,
+        repeat,
+        location,
+        description,
+        iconURL
     });
 
     return event
