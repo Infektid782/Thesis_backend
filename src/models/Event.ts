@@ -19,7 +19,8 @@ const EventSchema: Schema = new Schema(
         date: { type: String, required: true },
         repeat: { type: String, required: true },
         location: { type: String, required: true },
-        description: { type: String, required: true }
+        description: { type: String, required: true },
+        iconURL: { type: String, required: false }
     },
     {
         versionKey: false
