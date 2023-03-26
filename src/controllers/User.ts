@@ -1,21 +1,23 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
+import Logging from '../library/Logging';
 import User from '../models/User';
 
 const createUser = (req: Request, res: Response, next: NextFunction) => {
-    const { email, username, password, fullname, birthday, phone, gender, pictureURL } = req.body;
+    const { email, username, password, fullName, birthday, phoneNumber, gender, pictureURL } = req.body;
     const user = new User({
         _id: new mongoose.Types.ObjectId(),
         email,
         username,
         password,
-        fullname,
+        fullName,
         birthday,
-        phone,
+        phoneNumber,
         gender,
         pictureURL
     });
-
+    // Handle email and username duplication
+    Logging.info(user);
     return user
         .save()
         .then((user) => res.status(201).json({ user }))
