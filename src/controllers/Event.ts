@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import Event from '../models/Event';
 
 const createEvent = (req: Request, res: Response, next: NextFunction) => {
+    //const token = req.header;
     const { name, group, date, repeat, location, description, iconURL } = req.body;
     const event = new Event({
         _id: new mongoose.Types.ObjectId(),
@@ -23,7 +24,7 @@ const createEvent = (req: Request, res: Response, next: NextFunction) => {
 
 const readEvent = (req: Request, res: Response, next: NextFunction) => {
     const eventID = req.params.eventID;
-
+    Event.find({});
     return Event.findById(eventID)
         .then((event) => (event ? res.status(200).json({ event }) : res.status(404).json({ message: 'Not found' })))
         .catch((error) => res.status(500).json({ error }));

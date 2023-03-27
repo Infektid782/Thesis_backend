@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import Logging from '../library/Logging';
-import User from '../models/User';
+import User, { IUser } from '../models/User';
 
-const createUser = (req: Request, res: Response, next: NextFunction) => {
-    const { email, username, password, fullName, birthday, phoneNumber, gender, pictureURL } = req.body;
+const createUser = async (userData: IUser) => {
+    const { email, username, password, fullName, birthday, phoneNumber, gender, pictureURL } = userData;
     const user = new User({
         _id: new mongoose.Types.ObjectId(),
         email,
@@ -16,12 +16,8 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
         gender,
         pictureURL
     });
-    // Handle email and username duplication
-    Logging.info(user);
-    return user
-        .save()
-        .then((user) => res.status(201).json({ user }))
-        .catch((error) => res.status(500).json({ error }));
+    //Logging.info(user);
+    return await user.save();
 };
 
 const readUser = (req: Request, res: Response, next: NextFunction) => {
@@ -56,7 +52,8 @@ const updateUser = (req: Request, res: Response, next: NextFunction) => {
 };
 const deleteUser = (req: Request, res: Response, next: NextFunction) => {
     const userID = req.params.userID;
-
+    //const user = req.user
+    //return User.find(user.username, user.email) -- delete this
     return User.findByIdAndDelete(userID)
         .then((user) => (user ? res.status(201).json({ message: 'Deleted' }) : res.status(404).json({ message: 'Not found' })))
         .catch((error) => res.status(500).json({ error }));
