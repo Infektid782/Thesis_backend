@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
-import Logging from '../library/Logging';
 import User, { IUser } from '../models/User';
 
 const createUser = async (userData: IUser) => {
@@ -35,7 +34,6 @@ const readAllUsers = (req: Request, res: Response, next: NextFunction) => {
 };
 const updateUser = (req: Request, res: Response, next: NextFunction) => {
     const userID = req.params.userID;
-
     return User.findById(userID)
         .then((user) => {
             if (user) {
@@ -51,9 +49,8 @@ const updateUser = (req: Request, res: Response, next: NextFunction) => {
         .catch((error) => res.status(500).json({ error }));
 };
 const deleteUser = (req: Request, res: Response, next: NextFunction) => {
-    const userID = req.params.userID;
-    //const user = req.user
-    //return User.find(user.username, user.email) -- delete this
+    const user = req.user;
+    const userID = User.find(user.username, user.email);
     return User.findByIdAndDelete(userID)
         .then((user) => (user ? res.status(201).json({ message: 'Deleted' }) : res.status(404).json({ message: 'Not found' })))
         .catch((error) => res.status(500).json({ error }));

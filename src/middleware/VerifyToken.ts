@@ -10,7 +10,6 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
         }
         const decoded = jwt.verify(token, config.jwt.secretKey);
         req.user = decoded;
-        // generate fresh token
         res.set(config.token.headerName, `${token}`);
 
         return next();
