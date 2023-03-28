@@ -16,16 +16,23 @@ const createUser = async (userData: IUser) => {
         gender,
         pictureURL
     });
-    Logging.info(user);
+    Logging.info('Created: ' + user);
     return await user.save();
 };
 
-const readUser = (req: Request, res: Response, next: NextFunction) => {
-    const userID = req.params.userID;
-
-    return User.findById(userID)
-        .then((user) => (user ? res.status(200).json({ user }) : res.status(404).json({ message: 'Not found' })))
-        .catch((error) => res.status(500).json({ error }));
+const readUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const username = req.username;
+        const user = await User.findOne({ username });
+        if (!user) throw new Error('User not found!');
+        res.status(200).json({ user });
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(404).json({ message: error.message });
+        } else {
+            res.status(500).json({ message: 'unknown error' });
+        }
+    }
 };
 
 const readAllUsers = (req: Request, res: Response, next: NextFunction) => {
@@ -33,29 +40,31 @@ const readAllUsers = (req: Request, res: Response, next: NextFunction) => {
         .then((users) => res.status(200).json({ users }))
         .catch((error) => res.status(500).json({ error }));
 };
-const updateUser = (req: Request, res: Response, next: NextFunction) => {
-    const userID = req.params.userID;
-    return User.findById(userID)
-        .then((user) => {
-            if (user) {
-                user.set(req.body);
-                return user
-                    .save()
-                    .then((user) => res.status(201).json({ user }))
-                    .catch((error) => res.status(500).json({ error }));
-            } else {
-                res.status(404).json({ message: 'Not found' });
-            }
-        })
-        .catch((error) => res.status(500).json({ error }));
+
+const updateUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const username = req.username;
+        const user = await User.findOne({ username });
+        if (!user) throw new Error('User not found!');
+        user.set(req.body).save();
+        Logging.info('Updated: ' + user);
+        res.status(200).json({ user });
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(404).json({ message: error.message });
+        } else {
+            res.status(500).json({ message: 'unknown error' });
+        }
+    }
 };
+
 const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const username = req.username;
         const user = await User.deleteOne({ username });
-        if (user.deletedCount === 0) throw new Error(`Doesen't exist!`);
-        Logging.info(user);
-        res.status(201).json({ message: 'Deleted' });
+        if (user.deletedCount === 0) throw new Error('User not found!');
+        Logging.info('Deleted: ' + user);
+        res.status(201).json({ message: 'Deleted user.' });
     } catch (error) {
         if (error instanceof Error) {
             res.status(404).json({ message: error.message });

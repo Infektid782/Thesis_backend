@@ -10,7 +10,7 @@ const checkDuplicate = async (email: string, username: string) => {
     try {
         const checkEmail = await User.findOne({ email });
         const checkUsername = await User.findOne({ username });
-        if (checkEmail || checkUsername) throw new Error('duplicate');
+        if (checkEmail || checkUsername) throw new Error('User already exists!');
         return { status: 'success' };
     } catch (error) {
         if (error instanceof Error) {
@@ -23,7 +23,6 @@ const checkDuplicate = async (email: string, username: string) => {
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        // request body should containt { email, username, password, fullName, birthday, phoneNumber, gender, pictureURL }
         const userData = req.body;
         const check = await checkDuplicate(userData.email, userData.username);
         if (check.status === 'failed') throw Error(check.message);
