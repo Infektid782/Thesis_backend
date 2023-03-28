@@ -1,10 +1,9 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-//rename
-export type UserResponse = 'invited' | 'attending' | 'missing';
+export type UserAttendance = 'invited' | 'attending' | 'missing';
 export interface IInvitedUsers {
     username: string;
-    response: UserResponse;
+    attendance: UserAttendance;
 }
 
 export interface IEvent {
@@ -24,8 +23,7 @@ const EventSchema: Schema = new Schema(
     {
         name: { type: String, required: true },
         group: { type: String, required: true },
-        // Array review!
-        users: { type: [{ username: String, response: String }], required: false },
+        users: { type: [{ username: String, attendance: String }], required: true },
         date: { type: String, required: true },
         repeat: { type: String, required: true },
         location: { type: String, required: true },

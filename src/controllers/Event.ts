@@ -1,14 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
+import Logging from '../library/Logging';
 import Event from '../models/Event';
 
 const createEvent = (req: Request, res: Response, next: NextFunction) => {
-    //const token = req.header;
-    const { name, group, date, repeat, location, description, iconURL } = req.body;
+    const { name, group, users, date, repeat, location, description, iconURL } = req.body;
     const event = new Event({
         _id: new mongoose.Types.ObjectId(),
         name,
         group,
+        users,
         date,
         repeat,
         location,
@@ -35,6 +36,7 @@ const readAllEvents = (req: Request, res: Response, next: NextFunction) => {
         .then((events) => res.status(200).json({ events }))
         .catch((error) => res.status(500).json({ error }));
 };
+
 const updateEvent = (req: Request, res: Response, next: NextFunction) => {
     const eventID = req.params.eventID;
 
@@ -52,11 +54,12 @@ const updateEvent = (req: Request, res: Response, next: NextFunction) => {
         })
         .catch((error) => res.status(500).json({ error }));
 };
-const deleteEvent = (req: Request, res: Response, next: NextFunction) => {
+
+const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
     const eventID = req.params.eventID;
 
     return Event.findByIdAndDelete(eventID)
-        .then((event) => (event ? res.status(201).json({ message: 'Deleted' }) : res.status(404).json({ message: 'Not found' })))
+        .then((event) => (event ? res.status(201).json({ message: 'Deleted event.' }) : res.status(404).json({ message: 'Not found' })))
         .catch((error) => res.status(500).json({ error }));
 };
 
