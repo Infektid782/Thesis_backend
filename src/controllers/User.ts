@@ -53,11 +53,12 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const username = req.username;
         const user = await User.deleteOne({ username });
-        if (!user) throw new Error(' Not found');
+        if (user.deletedCount === 0) throw new Error(`Doesen't exist!`);
+        Logging.info(user);
         res.status(201).json({ message: 'Deleted' });
     } catch (error) {
         if (error instanceof Error) {
-            res.status(404).json({ error });
+            res.status(404).json({ message: error.message });
         } else {
             res.status(500).json({ message: 'unknown error' });
         }
