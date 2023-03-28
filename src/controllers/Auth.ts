@@ -23,6 +23,7 @@ const checkDuplicate = async (email: string, username: string) => {
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        // write proper error msgs
         // request body should containt { email, username, password, fullName, birthday, phoneNumber, gender, pictureURL }
         const userData = req.body;
         const check = await checkDuplicate(userData.email, userData.username);

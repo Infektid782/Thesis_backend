@@ -8,8 +8,8 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
         if (!token) {
             throw new Error('Token is missing!');
         }
-        const decoded = jwt.verify(token, config.jwt.secretKey);
-        req.user = decoded;
+        const decoded = jwt.verify(token, config.jwt.secretKey) as { username: string };
+        req.username = decoded.username;
         res.set(config.token.headerName, `${token}`);
 
         return next();

@@ -8,5 +8,6 @@
         "strict": true,
         "skipLibCheck": true
     },
-    "include": ["src/**/*", "src/server.ts"]
+    "include": ["src/**/*", "src/server.ts"],
+    "files": ["custom.d.ts"]
 }

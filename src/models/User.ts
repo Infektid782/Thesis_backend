@@ -11,11 +11,6 @@ export interface IUser {
     pictureURL: string;
 }
 
-export type User = {
-    email: string;
-    username: string;
-};
-
 export interface IUserModel extends IUser, Document {}
 
 const UserSchema: Schema = new Schema(
