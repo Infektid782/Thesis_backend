@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import User, { IUser } from '../models/User';
 import Logging from '../library/Logging';
+import * as jwt from 'jsonwebtoken';
+import { config } from '../config/config';
 
 const createUser = async (userData: IUser) => {
     const { email, username, password, fullName, birthday, phoneNumber, gender, pictureURL } = userData;
@@ -44,10 +46,15 @@ const readAllUsers = (req: Request, res: Response, next: NextFunction) => {
 const updateUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const username = req.username;
+        Logging.info(username);
         const user = await User.findOne({ username });
         if (!user) throw new Error('User not found!');
-        user.set(req.body).save();
+        await user.set(req.body).save();
         Logging.info('Updated: ' + user);
+        // Update password hash if password changed
+        // Delete other token
+        const token = jwt.sign({ username: user.username, password: user.password }, config.jwt.secretKey);
+        res.append('x-access-token', token);
         res.status(200).json({ user });
     } catch (error) {
         if (error instanceof Error) {

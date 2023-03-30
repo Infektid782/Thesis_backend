@@ -24,23 +24,20 @@ const checkDuplicate = async (email: string, username: string) => {
 const register = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userData = req.body;
+        if (!userData.email || !userData.username || !userData.password) throw Error('Missing data!');
         const check = await checkDuplicate(userData.email, userData.username);
         if (check.status === 'failed') throw Error(check.message);
-        // strong pw ??
         userData.password = await bcrypt.hash(userData.password, 10);
         const user = await controller.createUser(userData);
-        Logging.info(user);
-        // check if failed user creation leads to falsy
-        // maybe never fails??
-        if (!user) throw Error('failed');
+        Logging.info(`Created: ${user}`);
         const token = jwt.sign({ username: user.username, password: user.password }, config.jwt.secretKey);
         res.append('x-access-token', token);
         res.status(201).json({ user });
     } catch (error) {
         if (error instanceof Error) {
-            res.status(500).json({ message: error.message });
+            res.status(400).json({ message: error.message });
         } else {
-            res.status(500).json({ message: 'unknown error' });
+            res.status(500).json({ message: 'Unknown error!' });
         }
     }
 };
@@ -54,10 +51,10 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
         if (!checkPassword) throw Error('Password is incorrect');
         const token = jwt.sign({ username: user.username, password: user.password }, config.jwt.secretKey);
         res.append('x-access-token', token);
-        res.status(201).json({ user });
+        res.status(200).json({ user });
     } catch (error) {
         if (error instanceof Error) {
-            res.status(500).json({ message: error.message });
+            res.status(400).json({ message: error.message });
         } else {
             res.status(500).json({ message: 'unknown error' });
         }
