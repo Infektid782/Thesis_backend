@@ -106,11 +106,11 @@ const updateEvent = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
-    // FIX
     try {
         const eventID = req.params.eventID;
         const event = await Event.findByIdAndDelete(eventID);
-        Logging.info(event);
+        if (!event) throw new Error('Event not found');
+        Logging.info('Deleted: ' + event);
         res.status(201).json({ message: 'Deleted event!' });
     } catch (error) {
         if (error instanceof Error) {
@@ -119,10 +119,6 @@ const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
             res.status(500).json({ message: 'Unknown error!' });
         }
     }
-
-    // return Event.findByIdAndDelete(eventID)
-    //     .then((event) => (event ? res.status(201).json({ message: 'Deleted event.' }) : res.status(404).json({ message: 'Not found' })))
-    //     .catch((error) => res.status(500).json({ error }));
 };
 
 export default { createEvent, readEvent, readAllEvents, readEventsForUser, readEventsForGroup, updateEvent, deleteEvent };

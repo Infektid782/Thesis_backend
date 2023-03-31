@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import User, { IUser } from '../models/User';
 import Logging from '../library/Logging';
 import * as jwt from 'jsonwebtoken';
+import * as bcrypt from 'bcrypt';
 import { config } from '../config/config';
 
 const createUser = async (userData: IUser) => {
@@ -46,12 +47,15 @@ const readAllUsers = (req: Request, res: Response, next: NextFunction) => {
 const updateUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const username = req.username;
-        Logging.info(username);
+        const userData = req.body;
         const user = await User.findOne({ username });
         if (!user) throw new Error('User not found!');
-        await user.set(req.body).save();
+        const checkPassword = await bcrypt.compare(userData.password, user.password);
+        if (!checkPassword) {
+            userData.password = await bcrypt.hash(userData.password, 10);
+        }
+        await user.set(userData).save();
         Logging.info('Updated: ' + user);
-        // Update password hash if password changed
         // Delete other token
         const token = jwt.sign({ username: user.username, password: user.password }, config.jwt.secretKey);
         res.append('x-access-token', token);
