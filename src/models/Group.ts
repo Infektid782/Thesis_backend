@@ -2,13 +2,14 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IMembers {
     username: string;
-    rang: string;
+    rank: string;
 }
 
 export interface IGroup {
     name: string;
     events: string[];
     members: IMembers[];
+    owner: string;
     description: string;
     iconURL: string;
 }
@@ -19,7 +20,8 @@ const GroupSchema: Schema = new Schema(
     {
         name: { type: String, required: true },
         events: { type: [String], required: false },
-        members: { type: [{ username: String, rang: String }], required: true },
+        members: { type: [{ username: String, rank: String }], required: true },
+        owner: { type: String, required: true },
         description: { type: String, required: false },
         iconURL: { type: String, required: false }
     },
