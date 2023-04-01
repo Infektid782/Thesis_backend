@@ -10,7 +10,8 @@ const checkDuplicate = async (email: string, username: string) => {
     try {
         const checkEmail = await User.findOne({ email });
         const checkUsername = await User.findOne({ username });
-        if (checkEmail || checkUsername) throw new Error('User already exists!');
+        if (checkEmail) throw new Error('E-mail address is taken!');
+        if (checkUsername) throw new Error('Username is taken!');
         return { status: 'success' };
     } catch (error) {
         if (error instanceof Error) {
@@ -24,15 +25,16 @@ const checkDuplicate = async (email: string, username: string) => {
 const register = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userData = req.body;
-        if (!userData.email || !userData.username || !userData.password) throw Error('Missing data!');
+        const accountData = userData.accountData;
+        if (!accountData.email || !accountData.username || !accountData.password) throw Error('Missing data!');
         const check = await checkDuplicate(userData.email, userData.username);
         if (check.status === 'failed') throw Error(check.message);
-        userData.password = await bcrypt.hash(userData.password, 10);
+        accountData.password = await bcrypt.hash(accountData.password, 10);
         const user = await controller.createUser(userData);
         Logging.info(`Created: ${user}`);
-        const token = jwt.sign({ username: user.username, password: user.password }, config.jwt.secretKey);
+        const token = jwt.sign({ username: accountData.username, password: accountData.password }, config.jwt.secretKey);
         res.append('x-access-token', token);
-        res.status(201).json({ user });
+        res.status(201).json(user);
     } catch (error) {
         if (error instanceof Error) {
             res.status(400).json({ message: error.message });
@@ -47,9 +49,9 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
         const userData = req.body;
         const user = await User.findOne({ username: userData.username });
         if (!user) throw Error('Username is incorrect!');
-        const checkPassword = await bcrypt.compare(userData.password, user.password);
+        const checkPassword = await bcrypt.compare(userData.password, user.accountData.password);
         if (!checkPassword) throw Error('Password is incorrect');
-        const token = jwt.sign({ username: user.username, password: user.password }, config.jwt.secretKey);
+        const token = jwt.sign({ username: user.accountData.username, password: user.accountData.password }, config.jwt.secretKey);
         res.append('x-access-token', token);
         res.status(200).json({ user });
     } catch (error) {

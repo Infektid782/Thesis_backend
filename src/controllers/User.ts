@@ -7,19 +7,14 @@ import * as bcrypt from 'bcrypt';
 import { config } from '../config/config';
 
 const createUser = async (userData: IUser) => {
-    const { email, username, password, fullName, birthday, phoneNumber, gender, pictureURL } = userData;
+    const { accountData, personData } = userData;
+    const { email, username, password } = accountData;
+    const { fullName, birthday, phoneNumber, gender, pictureURL } = personData;
     const user = new User({
         _id: new mongoose.Types.ObjectId(),
-        email,
-        username,
-        password,
-        fullName,
-        birthday,
-        phoneNumber,
-        gender,
-        pictureURL
+        accountData,
+        personData
     });
-    Logging.info('Created: ' + user);
     return await user.save();
 };
 
@@ -50,14 +45,14 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
         const userData = req.body;
         const user = await User.findOne({ username });
         if (!user) throw new Error('User not found!');
-        const checkPassword = await bcrypt.compare(userData.password, user.password);
+        const checkPassword = await bcrypt.compare(userData.password, user.accountData.password);
         if (!checkPassword) {
             userData.password = await bcrypt.hash(userData.password, 10);
         }
         await user.set(userData).save();
         Logging.info('Updated: ' + user);
         // Delete other token
-        const token = jwt.sign({ username: user.username, password: user.password }, config.jwt.secretKey);
+        const token = jwt.sign({ username: user.accountData.username, password: user.accountData.password }, config.jwt.secretKey);
         res.append('x-access-token', token);
         res.status(200).json({ user });
     } catch (error) {
