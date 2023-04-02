@@ -8,8 +8,10 @@ import Logging from '../library/Logging';
 
 const checkDuplicate = async (email: string, username: string) => {
     try {
-        const checkEmail = await User.findOne({ email });
-        const checkUsername = await User.findOne({ username });
+        const checkEmail = await User.findOne({ 'accountData.email': email });
+        Logging.info(checkEmail);
+        const checkUsername = await User.findOne({ 'accountData.username': username });
+        Logging.info(checkUsername);
         if (checkEmail) throw new Error('E-mail address is taken!');
         if (checkUsername) throw new Error('Username is taken!');
         return { status: 'success' };
@@ -27,7 +29,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
         const userData = req.body;
         const accountData = userData.accountData;
         if (!accountData.email || !accountData.username || !accountData.password) throw Error('Missing data!');
-        const check = await checkDuplicate(userData.email, userData.username);
+        const check = await checkDuplicate(accountData.email, accountData.username);
         if (check.status === 'failed') throw Error(check.message);
         accountData.password = await bcrypt.hash(accountData.password, 10);
         const user = await controller.createUser(userData);

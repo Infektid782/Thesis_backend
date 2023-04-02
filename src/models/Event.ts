@@ -1,15 +1,16 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export type UserAttendance = 'invited' | 'attending' | 'missing';
-export interface IInvitedUsers {
+export interface IInvitedUser {
     username: string;
     attendance: UserAttendance;
+    profilePic: string;
 }
 
 export interface IEvent {
     name: string;
     group: string;
-    users: IInvitedUsers[];
+    users: IInvitedUser[];
     owner: string;
     date: string;
     repeat: string;
@@ -24,7 +25,7 @@ const EventSchema: Schema = new Schema(
     {
         name: { type: String, required: true },
         group: { type: String, required: true },
-        users: { type: [{ username: String, attendance: String }], required: true },
+        users: { type: [{ username: String, attendance: String, profilePic: String }], required: true },
         owner: { type: String },
         date: { type: String, required: true },
         repeat: { type: String, required: true },
