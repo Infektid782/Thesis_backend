@@ -1,9 +1,13 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export type UserAttendance = 'invited' | 'attending' | 'missing';
+
+export type Rank = 'owner' | 'admin' | 'member';
+
 export interface IInvitedUser {
     username: string;
     attendance: UserAttendance;
+    rank: Rank;
     profilePic: string;
 }
 

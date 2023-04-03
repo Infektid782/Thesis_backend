@@ -5,11 +5,11 @@ import Logging from '../library/Logging';
 
 const createGroup = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { name, events, members, owner, description, iconURL } = req.body;
+        const { name, eventIDs, members, owner, description, iconURL } = req.body;
         const group = new Group({
             _id: new mongoose.Types.ObjectId(),
             name,
-            events,
+            eventIDs,
             members,
             owner,
             description,

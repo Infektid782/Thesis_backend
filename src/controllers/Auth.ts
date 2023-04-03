@@ -9,9 +9,7 @@ import Logging from '../library/Logging';
 const checkDuplicate = async (email: string, username: string) => {
     try {
         const checkEmail = await User.findOne({ 'accountData.email': email });
-        Logging.info(checkEmail);
         const checkUsername = await User.findOne({ 'accountData.username': username });
-        Logging.info(checkUsername);
         if (checkEmail) throw new Error('E-mail address is taken!');
         if (checkUsername) throw new Error('Username is taken!');
         return { status: 'success' };
@@ -48,14 +46,14 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const userData = req.body;
-        const user = await User.findOne({ username: userData.username });
+        const { accountData } = req.body;
+        const user = await User.findOne({ 'accountData.username': accountData.username });
         if (!user) throw Error('Username is incorrect!');
-        const checkPassword = await bcrypt.compare(userData.password, user.accountData.password);
+        const checkPassword = await bcrypt.compare(accountData.password, user.accountData.password);
         if (!checkPassword) throw Error('Password is incorrect');
         const token = jwt.sign({ username: user.accountData.username, password: user.accountData.password }, config.jwt.secretKey);
         res.append('x-access-token', token);
-        res.status(200).json({ user });
+        res.status(200).json(user);
     } catch (error) {
         if (error instanceof Error) {
             res.status(400).json({ message: error.message });
