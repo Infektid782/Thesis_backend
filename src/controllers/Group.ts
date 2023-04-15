@@ -17,9 +17,10 @@ const createGroup = async (req: Request, res: Response, next: NextFunction) => {
         });
         await group.save();
         Logging.info('Created: ' + group);
-        res.status(201).json({ group });
+        res.status(201).json(group);
     } catch (error) {
         if (error instanceof Error) {
+            Logging.err(error.message);
             res.status(400).json({ message: error.message });
         } else {
             res.status(500).json({ message: 'Unknown error!' });
@@ -32,7 +33,7 @@ const readGroup = async (req: Request, res: Response, next: NextFunction) => {
         const groupID = req.params.groupID;
         const group = await Group.findById(groupID);
         if (!group) throw new Error('Group not found!');
-        res.status(200).json({ group });
+        res.status(200).json(group);
     } catch (error) {
         if (error instanceof Error) {
             res.status(404).json({ message: error.message });
