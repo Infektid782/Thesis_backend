@@ -11,6 +11,7 @@ export interface IGroup {
     name: string;
     eventIDs: string[];
     members: IMember[];
+    owner: string;
     description: string;
     iconURL: string;
 }
@@ -23,7 +24,7 @@ const GroupSchema: Schema = new Schema(
         eventIDs: { type: [String], required: false },
         members: { type: [{ username: String, rank: String }], required: true },
         owner: { type: String, required: true },
-        description: { type: String, required: false },
+        description: { type: String, required: true },
         iconURL: { type: String, required: false }
     },
     {
