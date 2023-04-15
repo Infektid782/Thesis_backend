@@ -5,7 +5,7 @@ import Event from '../models/Event';
 
 const createEvent = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { name, group, users, date, repeat, location, description, iconURL } = req.body;
+        const { name, group, users, date, repeat, location, iconURL } = req.body;
         const event = new Event({
             _id: new mongoose.Types.ObjectId(),
             name,
@@ -14,7 +14,6 @@ const createEvent = async (req: Request, res: Response, next: NextFunction) => {
             date,
             repeat,
             location,
-            description,
             iconURL
         });
         await event.save();
