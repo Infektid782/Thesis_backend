@@ -19,7 +19,6 @@ export interface IEvent {
     date: string;
     repeat: string;
     location: string;
-    description: string;
     iconURL: string;
 }
 
@@ -30,11 +29,10 @@ const EventSchema: Schema = new Schema(
         name: { type: String, required: true },
         group: { type: String, required: true },
         users: { type: [{ username: String, attendance: String, profilePic: String }], required: true },
-        owner: { type: String },
+        owner: { type: String, required: true },
         date: { type: String, required: true },
         repeat: { type: String, required: true },
         location: { type: String, required: true },
-        description: { type: String, required: true },
         iconURL: { type: String, required: false }
     },
     {
