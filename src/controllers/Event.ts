@@ -6,7 +6,7 @@ import Group from '../models/Group';
 
 const createEvent = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { title, group, users, date, repeat, location, iconURL } = req.body;
+        const { title, group, users, date, repeat, location } = req.body;
         const event = new Event({
             _id: new mongoose.Types.ObjectId(),
             title,
@@ -14,8 +14,7 @@ const createEvent = async (req: Request, res: Response, next: NextFunction) => {
             users,
             date,
             repeat,
-            location,
-            iconURL
+            location
         });
         const groupObj = await Group.findOne({ name: group });
         if (!groupObj) {
@@ -25,7 +24,7 @@ const createEvent = async (req: Request, res: Response, next: NextFunction) => {
         await groupObj.save();
         await event.save();
         Logging.info(`Created: ${event}`);
-        res.status(201).json({ event });
+        res.status(201).json(event);
     } catch (error) {
         if (error instanceof Error) {
             res.status(400).json({ message: error.message });
@@ -40,7 +39,7 @@ const readEvent = async (req: Request, res: Response, next: NextFunction) => {
         const eventID = req.params.eventID;
         const event = await Event.findById(eventID);
         if (!event) throw new Error('Event not found!');
-        res.status(200).json({ event });
+        res.status(200).json(event);
     } catch (error) {
         if (error instanceof Error) {
             res.status(404).json({ message: error.message });
