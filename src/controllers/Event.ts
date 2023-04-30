@@ -2,13 +2,14 @@ import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import Logging from '../library/Logging';
 import Event from '../models/Event';
+import Group from '../models/Group';
 
 const createEvent = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { name, group, users, date, repeat, location, iconURL } = req.body;
+        const { title, group, users, date, repeat, location, iconURL } = req.body;
         const event = new Event({
             _id: new mongoose.Types.ObjectId(),
-            name,
+            title,
             group,
             users,
             date,
@@ -16,6 +17,12 @@ const createEvent = async (req: Request, res: Response, next: NextFunction) => {
             location,
             iconURL
         });
+        const groupObj = await Group.findOne({ name: group });
+        if (!groupObj) {
+            throw new Error('Group not found');
+        }
+        groupObj.eventIDs.push(event._id);
+        await groupObj.save();
         await event.save();
         Logging.info(`Created: ${event}`);
         res.status(201).json({ event });
@@ -107,8 +114,12 @@ const updateEvent = async (req: Request, res: Response, next: NextFunction) => {
 const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const eventID = req.params.eventID;
-        const event = await Event.findByIdAndDelete(eventID);
+        const event = await Event.findById(eventID);
         if (!event) throw new Error('Event not found');
+        const group = await Group.findOneAndUpdate({ name: event.group }, { $pull: { eventIDs: eventID } }, { new: true });
+        Logging.warn(group?.eventIDs);
+        if (!group) throw new Error('Group not found');
+        const deletedEvent = await Event.findByIdAndDelete(eventID);
         Logging.info('Deleted: ' + event);
         res.status(201).json({ message: 'Deleted event!' });
     } catch (error) {
