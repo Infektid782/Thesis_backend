@@ -58,6 +58,25 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
+const updatePassword = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { username, oldPassword, newPassword } = req.body;
+        const user = await User.findOne({ 'accountData.username': username });
+        if (!user) throw new Error('User not found!');
+        const checkPassword = await bcrypt.compare(oldPassword, user.accountData.password);
+        if (!checkPassword) throw Error('Password is incorrect');
+        user.accountData.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+        res.status(200).json(user);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(404).json({ message: error.message });
+        } else {
+            res.status(500).json({ message: 'unknown error' });
+        }
+    }
+};
+
 const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const username = req.username;
@@ -74,4 +93,4 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
-export default { createUser, readUser, readAllUsers, updateUser, deleteUser };
+export default { createUser, readUser, readAllUsers, updateUser, updatePassword, deleteUser };

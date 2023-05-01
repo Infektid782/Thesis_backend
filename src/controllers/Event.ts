@@ -6,12 +6,13 @@ import Group from '../models/Group';
 
 const createEvent = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { title, group, users, date, repeat, location } = req.body;
+        const { title, group, users, owner, date, repeat, location } = req.body;
         const event = new Event({
             _id: new mongoose.Types.ObjectId(),
             title,
             group,
             users,
+            owner,
             date,
             repeat,
             location
