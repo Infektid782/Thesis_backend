@@ -5,11 +5,10 @@ import Logging from '../library/Logging';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import { config } from '../config/config';
+import { checkDuplicate } from './Auth';
 
 const createUser = async (userData: IUser) => {
     const { accountData, personData } = userData;
-    const { email, username, password } = accountData;
-    const { fullName, birthday, phoneNumber, gender, pictureURL } = personData;
     const user = new User({
         _id: new mongoose.Types.ObjectId(),
         accountData,
@@ -41,20 +40,15 @@ const readAllUsers = (req: Request, res: Response, next: NextFunction) => {
 
 const updateUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const username = req.username;
         const userData = req.body;
-        const user = await User.findOne({ username });
+        const { username } = userData.accountData;
+        Logging.warn(userData.accountData.username);
+        const user = await User.findOne({ 'accountData.username': username });
         if (!user) throw new Error('User not found!');
-        const checkPassword = await bcrypt.compare(userData.password, user.accountData.password);
-        if (!checkPassword) {
-            userData.password = await bcrypt.hash(userData.password, 10);
-        }
-        await user.set(userData).save();
+        user.personData = userData.personData;
+        await user.save();
         Logging.info('Updated: ' + user);
-        // Delete other token
-        const token = jwt.sign({ username: user.accountData.username, password: user.accountData.password }, config.jwt.secretKey);
-        res.append('x-access-token', token);
-        res.status(200).json({ user });
+        res.status(200).json(user);
     } catch (error) {
         if (error instanceof Error) {
             res.status(404).json({ message: error.message });

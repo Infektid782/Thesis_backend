@@ -6,7 +6,7 @@ import * as jwt from 'jsonwebtoken';
 import { config } from '../config/config';
 import Logging from '../library/Logging';
 
-const checkDuplicate = async (email: string, username: string) => {
+export const checkDuplicate = async (email: string, username: string) => {
     try {
         const checkEmail = await User.findOne({ 'accountData.email': email });
         const checkUsername = await User.findOne({ 'accountData.username': username });
