@@ -7,6 +7,7 @@ import eventRoutes from './routes/Event';
 import userRoutes from './routes/User';
 import authRoutes from './routes/Auth';
 import groupRoutes from './routes/Group';
+import Event from './controllers/Event';
 
 const router = express();
 
@@ -63,6 +64,11 @@ const StartServer = () => {
 
     /** Healthcheck */
     router.get('/ping', (req, res, next) => res.status(200).json({ message: 'pong' }));
+
+    const cron = require('node-cron');
+    cron.schedule('59 23 * * *', () => {
+        Event.eventGarbageCollector();
+    });
 
     /** Error handling */
     router.use((req, res, next) => {

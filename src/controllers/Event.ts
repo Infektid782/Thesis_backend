@@ -133,7 +133,26 @@ const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
 
 const eventGarbageCollector = async () => {
     const events = await Event.find();
-    const updatedEvents = events.map((m) => {});
+    events.forEach(async (event) => {
+        const eventDate = new Date(event.date);
+        const currentDate = new Date();
+
+        if (eventDate < currentDate && event.repeat === 'never') {
+            await event.deleteOne();
+        } else if (event.repeat === 'every day') {
+            const newDate = new Date(eventDate.getTime() + 24 * 60 * 60 * 1000);
+            event.date = newDate.toISOString();
+            await event.save();
+        } else if (event.repeat === 'every week') {
+            const newDate = new Date(eventDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+            event.date = newDate.toISOString();
+            await event.save();
+        } else if (event.repeat === 'every month') {
+            const newDate = new Date(eventDate.getFullYear(), eventDate.getMonth() + 1, eventDate.getDate());
+            event.date = newDate.toISOString();
+            await event.save();
+        }
+    });
 };
 
 export default { createEvent, readEvent, readAllEvents, readEventsForUser, readEventsForGroup, updateEvent, deleteEvent, eventGarbageCollector };
