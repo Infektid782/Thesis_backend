@@ -131,4 +131,9 @@ const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
-export default { createEvent, readEvent, readAllEvents, readEventsForUser, readEventsForGroup, updateEvent, deleteEvent };
+const eventGarbageCollector = async () => {
+    const events = await Event.find();
+    const updatedEvents = events.map((m) => {});
+};
+
+export default { createEvent, readEvent, readAllEvents, readEventsForUser, readEventsForGroup, updateEvent, deleteEvent, eventGarbageCollector };
