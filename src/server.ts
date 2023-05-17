@@ -27,11 +27,11 @@ mongoose
 const StartServer = () => {
     router.use((req, res, next) => {
         /** Log the request */
-        Logging.info(`Incomming -> Method: [${req.method}] - URL: [${req.url}] - IP [${req.socket.remoteAddress}]`);
+        Logging.info(`Incoming -> Method: [${req.method}] - URL: [${req.url}] - IP [${req.socket.remoteAddress}]`);
 
         res.on('finish', () => {
             /** Log the response */
-            Logging.info(`Incomming -> Method: [${req.method}] - URL: [${req.url}] - IP [${req.socket.remoteAddress}] - Status: [${res.statusCode}]`);
+            Logging.info(`Incoming -> Method: [${req.method}] - URL: [${req.url}] - IP [${req.socket.remoteAddress}] - Status: [${res.statusCode}]`);
         });
 
         next();
