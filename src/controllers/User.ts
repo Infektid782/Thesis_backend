@@ -2,10 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import User, { IUser } from '../models/User';
 import Logging from '../library/Logging';
-import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
-import { config } from '../config/config';
-import { checkDuplicate } from './Auth';
 
 const createUser = async (userData: IUser) => {
     const { accountData, personData } = userData;

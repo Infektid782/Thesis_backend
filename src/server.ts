@@ -31,7 +31,7 @@ const StartServer = () => {
 
         res.on('finish', () => {
             /** Log the response */
-            Logging.info(`Incoming -> Method: [${req.method}] - URL: [${req.url}] - IP [${req.socket.remoteAddress}] - Status: [${res.statusCode}]`);
+            Logging.info(`Outgoing -> Method: [${req.method}] - URL: [${req.url}] - IP [${req.socket.remoteAddress}] - Status: [${res.statusCode}]`);
         });
 
         next();
@@ -66,7 +66,7 @@ const StartServer = () => {
     router.get('/ping', (req, res, next) => res.status(200).json({ message: 'pong' }));
 
     const cron = require('node-cron');
-    cron.schedule('59 23 * * *', () => {
+    cron.schedule('59 18 * * *', () => {
         Event.eventGarbageCollector();
     });
 

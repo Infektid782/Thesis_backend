@@ -132,6 +132,7 @@ const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const eventGarbageCollector = async () => {
+    //TODO: TEST
     const events = await Event.find();
     events.forEach(async (event) => {
         const eventDate = new Date(event.date);
