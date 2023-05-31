@@ -84,6 +84,13 @@ const updateGroup = async (req: Request, res: Response, next: NextFunction) => {
         if (name !== group?.name) {
             const checkName = await Group.findOne({ name: name });
             if (checkName) throw new Error('This name is already taken!');
+            group.eventIDs.map(async (eventID) => {
+                const event = await Event.findById(eventID);
+                if (event) {
+                    event.group = group.name;
+                    await event?.save();
+                }
+            });
         }
         group.set(req.body).save();
         Logging.info('Updated: ' + group);
@@ -109,7 +116,6 @@ const memberJoined = async (req: Request, res: Response, next: NextFunction) => 
         group.eventIDs.map(async (eventID) => {
             const event = await Event.findById(eventID);
             event?.users.push({ username: username, attendance: 'Invited', profilePic: profilePic });
-            console.log(event);
             await event?.save();
         });
         Logging.info('Member added: ' + group);
